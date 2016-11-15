@@ -1,4 +1,4 @@
-"""A utility for downloading, parsing and sanitizing bank database Excel sheets from the RBI website."""
+"""A utility for downloading, parsing and sanitizing bank database (IFSC, MICR, address etc.) Excel sheets from the RBI website."""
 
 import argparse
 import rbiparser as rbi

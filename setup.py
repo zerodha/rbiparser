@@ -4,8 +4,8 @@ from setuptools import setup
 
 setup(
 	name="rbiparser",
-	version="0.01",
-	description="A utility for downloading, parsing and sanitizing bank database Excel sheets from the RBI website",
+	version="0.02",
+	description="A utility for downloading, parsing and sanitizing bank database (IFSC, MICR, address etc.) Excel sheets from the RBI website.",
 	author="Kailash Nadh",
 	author_email="kailash@nadh.in",
 	url="https://github.com/knadh/rbiparser",
