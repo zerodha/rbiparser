@@ -7,12 +7,15 @@ A utility for downloading, parsing and sanitizing bank database (IFSC, MICR, add
 
 ### Usage:
 ```shell
+# Create directories for storing the sheets.
+mkdir xls csv
+
 # Download the Excel files from the RBI website.
-python rbi.py -a download
+rbiparser -a download -xls "./xls"
 
 # Convert the downloaded files to CSV.
-python rbi.py -a convert
+rbiparser -a convert  -xls "./xls" -csv "./xls"
 
 # Combine the CSV records into one master file.
-python rbi.py -a combine -master all.csv
+rbiparser -a combine -xls "./xls" -csv "./xls" -master all.csv
 ```
