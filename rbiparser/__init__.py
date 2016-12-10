@@ -38,6 +38,9 @@ logger = logging.getLogger("rbiparser")
 
 HEADERS = ["BANK", "IFSC", "MICR", "BRANCH", "ADDRESS", "CONTACT", "CITY", "DISTRICT", "STATE"]
 
+module_path = os.path.dirname(__file__)
+
+# Regex
 alphanumeric = re.compile(r"[^a-z0-9]", re.IGNORECASE)
 spaces = re.compile(r"(\s+)")
 brackets = re.compile(r"([^\s])(\()(.+?)(\))([a-z0-9])?")
@@ -163,6 +166,10 @@ def download_all(scrape_url, xls_dir, etags_file):
 	urls = get_sheet_urls(scrape_url)
 	logger.info("%d sheets to download" % (len(urls),))
 
+	# Create xls folder if path doesn't exist
+	if not os.path.exists(xls_dir):
+		os.mkdir(xls_dir)
+
 	# HTTP urls don't work.
 	urls = [u.replace("http:", "https:") for u in urls]
 
@@ -202,6 +209,10 @@ def download_all(scrape_url, xls_dir, etags_file):
 
 def convert_all(src, target, headers):
 	"""Convert all cls files to csv."""
+	# Create csv folder if path doesn't exist
+	if not os.path.exists(target):
+		os.mkdir(target)
+
 	files = glob.glob(src + "/*.xls")
 	for x in files:
 		c = target + "/" + x.split("/")[-1].replace(".xls", ".csv")
