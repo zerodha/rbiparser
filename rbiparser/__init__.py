@@ -8,9 +8,9 @@ Scrapes the RBI IFS .xls sheet dumps and imports them.
    so that unchanged files are not redownloaded each time.
 
 Usage:
-  python rbi.py -a download
-  python rbi.py -a convert
-  python rbi.py -a combine -master all.csv
+  rbiparser download
+  rbiparser convert
+  rbiparser combine
 
 License: MIT License
 

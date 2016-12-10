@@ -1,33 +1,45 @@
-"""A utility for downloading, parsing and sanitizing bank database (IFSC, MICR, address etc.) Excel sheets from the RBI website."""
-
-import argparse
+import click
 import rbiparser as rbi
 
 SOURCE_URL = "https://www.rbi.org.in/scripts/bs_viewcontent.aspx?Id=2009"
 
 
-def run():
-	"""Run the rbiparser library as a console program."""
-	parser = argparse.ArgumentParser(description="RBI IFSC db scraper + parser")
+@click.group()
+def cli():
+	"""
+	Rbiparser command line utility
+	"""
 
-	parser.add_argument("-a", help="Action", required=True, type=str, dest="action", choices=["download", "convert", "combine"])
-	parser.add_argument("-xls", help="Diretory to write xls files", default="xls", type=str, dest="xls")
-	parser.add_argument("-csv", help="Diretory to write csv files", default="csv", type=str, dest="csv")
-	parser.add_argument("-etags", help="Path to the etags.json file", type=str, dest="etags", default="etags.json")
-	parser.add_argument("-master", help="Path to the parsed, cleaned, and combined master csv file", required=False, type=str, dest="master", default="master.csv")
-	parser.add_argument("-source", help="Full URL to the RBI page where the Excel sheets are listed", required=False, type=str, dest="source", default=SOURCE_URL)
 
-	try:
-		args = parser.parse_args()
-	except Exception as e:
-		print(str(e))
+@cli.command()
+@click.option('-s', '--source', type=click.STRING, default=SOURCE_URL,
+	help="Source url to download documents. Defaults to RBI data source.")
+@click.option('-d', '--dest', type=click.Path(dir_okay=True), default="xls",
+	help="Download destination directory.")
+@click.option('-e', '--etag', type=click.Path(file_okay=True), default="etags.json",
+	help="Etags file")
+def download(source, dest, etag):
+	"""Download all listed bank documents from RBI as .xls format."""
+	rbi.download_all(source, dest, etag)
 
-	if args.action == "download":
-		rbi.download_all(args.source, args.xls, args.etags)
-	elif args.action == "convert":
-		rbi.convert_all(args.xls, args.csv, rbi.HEADERS)
-	elif args.action == "combine":
-		rbi.combine_csvs(args.csv, args.master, rbi.HEADERS)
 
-if __name__ == "__main__":
-	run()
+@cli.command()
+@click.option('-s', '--source', type=click.Path(dir_okay=True, exists=True), default="xls",
+	help="xls documents directory")
+@click.option('-d', '--dest', type=click.Path(dir_okay=True), default="csv",
+	help="Target directory for CSV files.")
+def convert(source, dest):
+	"""Convert all xls documents to CSV"""
+	rbi.convert_all(source, dest, rbi.HEADERS)
+
+
+@cli.command()
+@click.option('-s', '--source', type=click.Path(dir_okay=True, exists=True), default="csv",
+	help="CSV files directory")
+@click.option('-d', '--dest', type=click.Path(), default="data.csv",
+	help="Name of the combined csv file.")
+@click.option('-f', '--filters', type=click.BOOL, default=False, is_flag=True,
+	help="Apply advanced filters to clean the data")
+def combine(source, dest, filters):
+	"""Combine and clean all the indivdual CSV files"""
+	rbi.combine_csvs(source, dest, rbi.HEADERS, filters)

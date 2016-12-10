@@ -7,15 +7,19 @@ A utility for downloading, parsing and sanitizing bank database (IFSC, MICR, add
 
 ### Usage:
 ```shell
-# Create directories for storing the sheets.
-mkdir xls csv
 
 # Download the Excel files from the RBI website.
-rbiparser -a download -xls "./xls"
+rbiparser download -d "./xls"
 
 # Convert the downloaded files to CSV.
-rbiparser -a convert  -xls "./xls" -csv "./xls"
+rbiparser convert  -s "./xls" -d "./csv"
 
 # Combine the CSV records into one master file.
-rbiparser -a combine -xls "./xls" -csv "./xls" -master all.csv
+rbiparser combine -s "./csv" -d "data.csv"
+
+# Help for individual command
+rbiparser combine --help
+
+# Apply advanced clean filters
+rbiparser combine -s "./csv" -d "data.csv" -f
 ```

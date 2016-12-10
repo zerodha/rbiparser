@@ -14,7 +14,7 @@ setup(
 	license="MIT License",
 	entry_points={
 		'console_scripts': [
-			'rbiparser = rbiparser.console:run'
+			'rbiparser = rbiparser.console:cli'
 		],
 	},
 	classifiers=[
@@ -28,5 +28,5 @@ setup(
 		"Topic :: Database",
 		"Topic :: Software Development :: Libraries"
 	],
-	install_requires=["requests", "xlrd"]
+	install_requires=["requests", "xlrd", "click"]
 )
