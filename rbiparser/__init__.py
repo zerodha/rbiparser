@@ -266,7 +266,6 @@ def clean_row(row, filters=False):
 	pincode = pin.findall(row[4])
 	if len(pincode) > 0:
 		pincode = pincode[0].replace(" ", "")
-		pincode = pincode[0:3] + " " + pincode[3:]
 
 		# Remove the pincode.
 		row[4] = pin.sub("", row[4]).strip()
