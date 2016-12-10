@@ -1,0 +1,7 @@
+{
+    "replace": [
+        ["*", "Hdfc Bank Ltd.,", ""],
+        ["*", "Hdfc Bank Ltd.", ""],
+        ["*", "Hdfc Bank Ltd", ""]
+    ]
+}

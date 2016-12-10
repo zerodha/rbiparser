@@ -214,7 +214,7 @@ def convert_all(src, target, headers):
 			logger.error("Failed: " + str(e))
 
 
-def combine_csvs(src, master, headers):
+def combine_csvs(src, master, headers, filters=False):
 	"""Combine multiple CSVs to one."""
 	out = open(master, "w")
 	writer = csv.writer(out)
@@ -233,10 +233,10 @@ def combine_csvs(src, master, headers):
 			next(reader)
 			for row in reader:
 				row.append(fname)
-				writer.writerow(clean_row(row))
+				writer.writerow(clean_row(row, filters=filters))
 
 
-def clean_row(row):
+def clean_row(row, filters=False):
 	"""Clean a single row from the CSV."""
 	# Load map of bank abbrivations
 	bank_map = load_json("../banks.json")
@@ -303,6 +303,12 @@ def clean_row(row):
 
 	# Add abbreviation
 	row[9] = get_abbreviation(clean_line(row[0]), bank_map)
+
+	# clean fields
+	if filters:
+		filters_map = load_json("../filters.json")
+		# Apply replace filter
+		row = apply_replace_filter(row, filters_map["replace"])
 
 	return row
 
@@ -403,3 +409,18 @@ def load_json(file_path):
 	path = os.path.normpath(os.path.join(module_path, file_path))
 	with open(path, "r") as f:
 		return json.load(f)
+
+
+def apply_replace_filter(row, filters_map):
+	"""Apply string replace filter. Currently supports only wildcard string replace"""
+	for c in filters_map:
+		pattern, source_str, replace_str = c
+		if pattern == "*":
+			for i in range(len(row)):
+				# Combine all the fields in rown, replace the string and again split the string to row
+				row = "|".join(row).replace(source_str, replace_str).strip().split("|")
+		else:
+			# Todo
+			pass
+
+	return row
