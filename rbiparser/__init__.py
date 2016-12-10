@@ -219,6 +219,9 @@ def combine_csvs(src, master, headers):
 	out = open(master, "w")
 	writer = csv.writer(out)
 
+	# Add abbreviation to header
+	headers.append("ABBREVIATION")
+
 	writer.writerow(headers)
 
 	files = glob.glob(src + "/*.csv")
@@ -235,11 +238,14 @@ def combine_csvs(src, master, headers):
 
 def clean_row(row):
 	"""Clean a single row from the CSV."""
+	# Load map of bank abbrivations
+	bank_map = load_json("../banks.json")
+
 	row = [r.strip() for r in row]
 	row = [spaces.sub(" ", r) for r in row]
 
-	# Name.
-	row[0] = clean_line(row[0])
+	# Bank name
+	row[0] = clean_name(clean_line(row[0]), bank_map)
 
 	# IFSC.
 	row[1] = row[1].upper()
@@ -294,6 +300,9 @@ def clean_row(row):
 	# Reattach pin to the address.
 	if pincode:
 		row[4] += " - " + pincode
+
+	# Add abbreviation
+	row[9] = get_abbreviation(clean_line(row[0]), bank_map)
 
 	return row
 
@@ -361,4 +370,36 @@ def clean_line(line, complicated=False):
 	# Trailing punctuations.
 	line = trailing_punctuations.sub("", line)
 
+	# fix caps 'OF'
+	line = line.replace(" OF ", " of ")
+
 	return line
+
+
+def clean_name(name, bank_map):
+	"""Clean bank name by properly capitalizing the name"""
+	name = name.upper()
+	abbreviation = bank_map.get(name, "")
+
+	cleaned_name = ""
+	for s in name.split(" "):
+		if s == abbreviation:
+			cleaned_name += s + " "
+		elif s == "OF":
+			cleaned_name += "of "
+		else:
+			cleaned_name += s[:1].upper() + s[1:].lower() + " "
+
+	return cleaned_name.strip()
+
+
+def get_abbreviation(name, bank_map):
+	"""Get abbreviation for given bank name"""
+	return bank_map.get(name.upper(), "")
+
+
+def load_json(file_path):
+	"""Load json file as dict"""
+	path = os.path.normpath(os.path.join(module_path, file_path))
+	with open(path, "r") as f:
+		return json.load(f)
