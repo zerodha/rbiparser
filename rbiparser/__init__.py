@@ -36,7 +36,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logging.getLogger("requests").setLevel(logging.CRITICAL)
 logger = logging.getLogger("rbiparser")
 
-HEADERS = ["BANK", "IFSC", "MICR CODE", "BRANCH", "ADDRESS", "CONTACT", "CITY", "DISTRICT", "STATE"]
+HEADERS = ["BANK", "IFSC", "MICR", "BRANCH", "ADDRESS", "CONTACT", "CITY", "DISTRICT", "STATE"]
 
 alphanumeric = re.compile(r"[^a-z0-9]", re.IGNORECASE)
 spaces = re.compile(r"(\s+)")
