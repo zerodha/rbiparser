@@ -426,9 +426,8 @@ def apply_replace_filter(row, filters_map):
 	for c in filters_map:
 		pattern, source_str, replace_str = c
 		if pattern == "*":
-			for i in range(len(row)):
-				# Combine all the fields in rown, replace the string and again split the string to row
-				row = "|".join(row).replace(source_str, replace_str).strip().split("|")
+			# Combine all the fields in rown, replace the string and again split the string to row
+			row = "|".join(row).replace(source_str, replace_str).strip().split("|")
 		else:
 			# Todo
 			pass
