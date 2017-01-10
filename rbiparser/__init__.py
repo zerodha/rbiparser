@@ -8,9 +8,9 @@ Scrapes the RBI IFS .xls sheet dumps and imports them.
    so that unchanged files are not redownloaded each time.
 
 Usage:
-  python rbi.py -a download
-  python rbi.py -a convert
-  python rbi.py -a combine -master all.csv
+  rbiparser download
+  rbiparser convert
+  rbiparser combine
 
 License: MIT License
 
@@ -36,8 +36,11 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logging.getLogger("requests").setLevel(logging.CRITICAL)
 logger = logging.getLogger("rbiparser")
 
-HEADERS = ["BANK", "IFSC", "MICR CODE", "BRANCH", "ADDRESS", "CONTACT", "CITY", "DISTRICT", "STATE"]
+HEADERS = ["BANK", "IFSC", "MICR", "BRANCH", "ADDRESS", "CONTACT", "CITY", "DISTRICT", "STATE"]
 
+module_path = os.path.dirname(__file__)
+
+# Regex
 alphanumeric = re.compile(r"[^a-z0-9]", re.IGNORECASE)
 spaces = re.compile(r"(\s+)")
 brackets = re.compile(r"([^\s])(\()(.+?)(\))([a-z0-9])?")
@@ -163,6 +166,10 @@ def download_all(scrape_url, xls_dir, etags_file):
 	urls = get_sheet_urls(scrape_url)
 	logger.info("%d sheets to download" % (len(urls),))
 
+	# Create xls folder if path doesn't exist
+	if not os.path.exists(xls_dir):
+		os.mkdir(xls_dir)
+
 	# HTTP urls don't work.
 	urls = [u.replace("http:", "https:") for u in urls]
 
@@ -202,6 +209,10 @@ def download_all(scrape_url, xls_dir, etags_file):
 
 def convert_all(src, target, headers):
 	"""Convert all cls files to csv."""
+	# Create csv folder if path doesn't exist
+	if not os.path.exists(target):
+		os.mkdir(target)
+
 	files = glob.glob(src + "/*.xls")
 	for x in files:
 		c = target + "/" + x.split("/")[-1].replace(".xls", ".csv")
@@ -214,10 +225,13 @@ def convert_all(src, target, headers):
 			logger.error("Failed: " + str(e))
 
 
-def combine_csvs(src, master, headers):
+def combine_csvs(src, master, headers, filters=False):
 	"""Combine multiple CSVs to one."""
 	out = open(master, "w")
 	writer = csv.writer(out)
+
+	# Add abbreviation to header
+	headers.append("ABBREVIATION")
 
 	writer.writerow(headers)
 
@@ -230,16 +244,19 @@ def combine_csvs(src, master, headers):
 			next(reader)
 			for row in reader:
 				row.append(fname)
-				writer.writerow(clean_row(row))
+				writer.writerow(clean_row(row, filters=filters))
 
 
-def clean_row(row):
+def clean_row(row, filters=False):
 	"""Clean a single row from the CSV."""
+	# Load map of bank abbrivations
+	bank_map = load_json("../banks.json")
+
 	row = [r.strip() for r in row]
 	row = [spaces.sub(" ", r) for r in row]
 
-	# Name.
-	row[0] = clean_line(row[0])
+	# Bank name
+	row[0] = clean_name(clean_line(row[0]), bank_map)
 
 	# IFSC.
 	row[1] = row[1].upper()
@@ -260,7 +277,6 @@ def clean_row(row):
 	pincode = pin.findall(row[4])
 	if len(pincode) > 0:
 		pincode = pincode[0].replace(" ", "")
-		pincode = pincode[0:3] + " " + pincode[3:]
 
 		# Remove the pincode.
 		row[4] = pin.sub("", row[4]).strip()
@@ -294,6 +310,15 @@ def clean_row(row):
 	# Reattach pin to the address.
 	if pincode:
 		row[4] += " - " + pincode
+
+	# Add abbreviation
+	row[9] = get_abbreviation(clean_line(row[0]), bank_map)
+
+	# clean fields
+	if filters:
+		filters_map = load_json("../filters.json")
+		# Apply replace filter
+		row = apply_replace_filter(row, filters_map["replace"])
 
 	return row
 
@@ -361,4 +386,50 @@ def clean_line(line, complicated=False):
 	# Trailing punctuations.
 	line = trailing_punctuations.sub("", line)
 
+	# fix caps 'OF'
+	line = line.replace(" OF ", " of ")
+
 	return line
+
+
+def clean_name(name, bank_map):
+	"""Clean bank name by properly capitalizing the name"""
+	name = name.upper()
+	abbreviation = bank_map.get(name, "")
+
+	cleaned_name = ""
+	for s in name.split(" "):
+		if s == abbreviation:
+			cleaned_name += s + " "
+		elif s == "OF":
+			cleaned_name += "of "
+		else:
+			cleaned_name += s[:1].upper() + s[1:].lower() + " "
+
+	return cleaned_name.strip()
+
+
+def get_abbreviation(name, bank_map):
+	"""Get abbreviation for given bank name"""
+	return bank_map.get(name.upper(), "")
+
+
+def load_json(file_path):
+	"""Load json file as dict"""
+	path = os.path.normpath(os.path.join(module_path, file_path))
+	with open(path, "r") as f:
+		return json.load(f)
+
+
+def apply_replace_filter(row, filters_map):
+	"""Apply string replace filter. Currently supports only wildcard string replace"""
+	for c in filters_map:
+		pattern, source_str, replace_str = c
+		if pattern == "*":
+			# Combine all the fields in rown, replace the string and again split the string to row
+			row = "|".join(row).replace(source_str, replace_str).strip().split("|")
+		else:
+			# Todo
+			pass
+
+	return row
