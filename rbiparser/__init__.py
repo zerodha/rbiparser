@@ -38,7 +38,9 @@ logger = logging.getLogger("rbiparser")
 
 HEADERS = ["BANK", "IFSC", "MICR", "BRANCH", "ADDRESS", "CONTACT", "CITY", "DISTRICT", "STATE"]
 
-module_path = os.path.dirname(__file__)
+module_path = os.path.dirname(os.path.abspath(__file__))
+banks_list_filename = "banks.json"
+filters_filename = "filters.json"
 
 # Regex
 alphanumeric = re.compile(r"[^a-z0-9]", re.IGNORECASE)
@@ -237,6 +239,7 @@ def combine_csvs(src, master, headers, filters=False):
 
 	files = glob.glob(src + "/*.csv")
 	for fname in files:
+		logging.info("processing file: {}".format(fname))
 		with open(fname, "r") as f:
 			reader = csv.reader(f)
 
@@ -250,7 +253,7 @@ def combine_csvs(src, master, headers, filters=False):
 def clean_row(row, filters=False):
 	"""Clean a single row from the CSV."""
 	# Load map of bank abbrivations
-	bank_map = load_json("../banks.json")
+	bank_map = load_json(banks_list_filename)
 
 	row = [r.strip() for r in row]
 	row = [spaces.sub(" ", r) for r in row]
@@ -316,7 +319,7 @@ def clean_row(row, filters=False):
 
 	# clean fields
 	if filters:
-		filters_map = load_json("../filters.json")
+		filters_map = load_json(filters_filename)
 		# Apply replace filter
 		row = apply_replace_filter(row, filters_map["replace"])
 
