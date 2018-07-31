@@ -6,15 +6,15 @@ README = open("README.md").read()
 
 setup(
 	name="rbiparser",
-	version="0.6.0",
+	version="0.6.1",
 	description="A utility for downloading, parsing and sanitizing bank database (IFSC, MICR, address etc.) Excel sheets from the RBI website.",
 	long_description=README,
 	author="Kailash Nadh",
 	author_email="kailash@nadh.in",
-	url="https://github.com/knadh/rbiparser",
+	url="https://github.com/zerodhatech/rbiparser",
 	packages=['rbiparser'],
 	include_package_data=True,
-	download_url="https://github.com/knadh/rbiparser",
+	download_url="https://github.com/zerodhatech/rbiparser",
 	license="MIT License",
 	entry_points={
 		'console_scripts': [
@@ -32,5 +32,5 @@ setup(
 		"Topic :: Database",
 		"Topic :: Software Development :: Libraries"
 	],
-	install_requires=["requests", "xlrd", "click"]
+	install_requires=["requests", "xlrd", "beautifulsoup4", "click"]
 )

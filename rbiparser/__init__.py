@@ -27,6 +27,7 @@ import glob
 import string
 
 import requests
+from bs4 import BeautifulSoup as soup
 import xlrd
 
 import logging
@@ -71,12 +72,13 @@ def get_sheet_urls(url):
 		raise Exception("Invalid response from", url)
 
 	# Extract the urls.
-	m = re.findall(r"(https?:\/\/(.+?)\.xls)", r.content)
+	s = soup(r.content, "lxml")
+	links = s.findAll("a", href=re.compile("\.xls$"))
 
-	if not m or len(m) < 1:
+	if len(links) < 1:
 		raise Exception("Couldn't find any .xls urls")
 
-	return [u[0] for u in m]
+	return [l["href"] for l in links]
 
 
 def convert_xls_to_csv(src, target, headers):
