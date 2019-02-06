@@ -32,5 +32,5 @@ setup(
 		"Topic :: Database",
 		"Topic :: Software Development :: Libraries"
 	],
-	install_requires=["requests", "xlrd", "beautifulsoup4", "click"]
+	install_requires=["requests", "xlrd", "beautifulsoup4", "click", "lxml"]
 )

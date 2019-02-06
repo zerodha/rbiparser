@@ -21,10 +21,14 @@ May 2013
 import re
 import csv
 import json
-import urlparse
 import os
 import glob
 import string
+
+try:
+	from urlparse import urlparse
+except ImportError:
+	from urllib.parse import urlparse
 
 import requests
 from bs4 import BeautifulSoup as soup
@@ -113,7 +117,7 @@ def convert_xls_to_csv(src, target, headers):
 
 def url_to_file(url):
 	"""Exctract the potential filename from a file url."""
-	return urlparse.urlparse(url).path.split("/")[-1]
+	return urlparse(url).path.split("/")[-1]
 
 
 def load_etags(fname):
