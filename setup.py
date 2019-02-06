@@ -6,7 +6,7 @@ README = open("README.md").read()
 
 setup(
 	name="rbiparser",
-	version="0.6.1",
+	version="0.6.2",
 	description="A utility for downloading, parsing and sanitizing bank database (IFSC, MICR, address etc.) Excel sheets from the RBI website.",
 	long_description=README,
 	author="Kailash Nadh",
