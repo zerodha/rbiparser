@@ -14,17 +14,17 @@ def cli():
 @cli.command()
 @click.option('-s', '--source', type=click.STRING, default=SOURCE_URL,
 	help="Source url to download documents. Defaults to RBI data source.")
-@click.option('-d', '--dest', type=click.Path(dir_okay=True), default="xls",
+@click.option('-d', '--dest', type=click.Path(dir_okay=True), default="xlsx",
 	help="Download destination directory.")
 @click.option('-e', '--etag', type=click.Path(file_okay=True), default="etags.json",
 	help="Etags file")
 def download(source, dest, etag):
-	"""Download all listed bank documents from RBI as .xls format."""
+	"""Download all listed bank documents from RBI as .xlsx format."""
 	rbi.download_all(source, dest, etag)
 
 
 @cli.command()
-@click.option('-s', '--source', type=click.Path(dir_okay=True, exists=True), default="xls",
+@click.option('-s', '--source', type=click.Path(dir_okay=True, exists=True), default="xlsx",
 	help="xls documents directory")
 @click.option('-d', '--dest', type=click.Path(dir_okay=True), default="csv",
 	help="Target directory for CSV files.")

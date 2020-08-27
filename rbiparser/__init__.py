@@ -1,7 +1,7 @@
 """A utility for downloading, parsing and sanitizing bank database (IFSC, MICR, address etc.) Excel sheets from the RBI website.
 
-Scrapes the RBI IFS .xls sheet dumps and imports them.
-1. Reads all the .xls URLs from the RBI page
+Scrapes the RBI IFS .xlsx sheet dumps and imports them.
+1. Reads all the .xlsx URLs from the RBI page
 2. Downloads each file into a directory and
    converts it to a CSV in another directory.
 3. Each file's http etag header is saved in a file (etags.json),
@@ -70,23 +70,23 @@ exclude_words = ["to", "the", "at", "of", "by", "as", "for", "via"]
 
 
 def get_sheet_urls(url):
-	"""Scrapes the RBI page and gets the list of .xls sheets."""
+	"""Scrapes the RBI page and gets the list of .xlsx sheets."""
 	r = requests.get(url)
 	if r.status_code != 200:
 		raise Exception("Invalid response from", url)
 
 	# Extract the urls.
 	s = soup(r.content, "lxml")
-	links = s.findAll("a", href=re.compile("\.xls$"))
+	links = s.findAll("a", href=re.compile("\.xlsx$"))
 
 	if len(links) < 1:
-		raise Exception("Couldn't find any .xls urls")
+		raise Exception("Couldn't find any .xlsx urls")
 
 	return [l["href"] for l in links]
 
 
-def convert_xls_to_csv(src, target, headers):
-	"""Convert .xls to .csv files."""
+def convert_xlsx_to_csv(src, target, headers):
+	"""Convert .xlsx to .csv files."""
 	try:
 		sheet = xlrd.open_workbook(src).sheet_by_index(0)
 	except Exception as e:
@@ -169,14 +169,14 @@ def download(url, target):
 	}
 
 
-def download_all(scrape_url, xls_dir, etags_file):
+def download_all(scrape_url, xlsx_dir, etags_file):
 	"""Download all files."""
 	urls = get_sheet_urls(scrape_url)
 	logger.info("%d sheets to download" % (len(urls),))
 
-	# Create xls folder if path doesn't exist
-	if not os.path.exists(xls_dir):
-		os.mkdir(xls_dir)
+	# Create xlsx folder if path doesn't exist
+	if not os.path.exists(xlsx_dir):
+		os.mkdir(xlsx_dir)
 
 	# HTTP urls don't work.
 	urls = [u.replace("http:", "https:") for u in urls]
@@ -189,7 +189,7 @@ def download_all(scrape_url, xls_dir, etags_file):
 		logger.info("%d - %s" % (n, url))
 
 		fname = url_to_file(url)
-		xls_path = xls_dir + "/" + fname
+		xlsx_path = xlsx_dir + "/" + fname
 
 		# Get the URL headers.
 		try:
@@ -198,7 +198,7 @@ def download_all(scrape_url, xls_dir, etags_file):
 
 			if url in etags and \
 				etags[url] == et and \
-				os.path.isfile(xls_path):
+				os.path.isfile(xlsx_path):
 
 				logger.info("> Same etag. Skipping")
 				continue
@@ -209,7 +209,7 @@ def download_all(scrape_url, xls_dir, etags_file):
 			etags[url] = et
 			save_etags(etags, "etags.json")
 
-			download(url, xls_path)
+			download(url, xlsx_path)
 		except Exception as e:
 			logger.exception(e)
 			continue
@@ -221,14 +221,14 @@ def convert_all(src, target, headers):
 	if not os.path.exists(target):
 		os.mkdir(target)
 
-	files = glob.glob(src + "/*.xls")
+	files = glob.glob(src + "/*.xlsx")
 	for x in files:
-		c = target + "/" + x.split("/")[-1].replace(".xls", ".csv")
+		c = target + "/" + x.split("/")[-1].replace(".xlsx", ".csv")
 
 		logger.info("%s -> %s" % (x, c))
 
 		try:
-			convert_xls_to_csv(x, c, headers)
+			convert_xlsx_to_csv(x, c, headers)
 		except Exception as e:
 			logger.error("Failed: " + str(e))
 
