@@ -1,4 +1,4 @@
-# rbiparser
+# rbiparser is an amazing project
 
 A utility for downloading, parsing and sanitizing bank database (IFSC, MICR, address etc.) Excel sheets from the [RBI website](https://www.rbi.org.in/scripts/bs_viewcontent.aspx?Id=2009).
 
@@ -23,4 +23,4 @@ rbiparser combine --help
 # Apply advanced clean filters
 rbiparser combine -s "./csv" -d "data.csv" -f
 ```
-.
+
