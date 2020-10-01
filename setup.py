@@ -1,9 +1,10 @@
 #!/usr/bin/env python
+# This is a very good program 
 from codecs import open
 from setuptools import setup
 
 README = open("README.md").read()
-
+#this is the setup part of the program 
 setup(
 	name="rbiparser",
 	version="0.6.2",
