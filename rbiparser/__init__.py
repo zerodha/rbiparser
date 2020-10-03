@@ -97,12 +97,11 @@ def convert_xlsx_to_csv(src, target, headers):
 
 		first = False
 		try:
-			for n in xrange(sheet.nrows):
+			for n in range(sheet.nrows):
 				vals = sheet.row_values(n)
 
 				# There are junk unicode characters that need to be stripped.
-				vals = [v.encode("ascii", errors="ignore") if type(v) is unicode else v for v in vals]
-
+				vals = [v.encode("ascii", errors="ignore") for v in vals]
 				# Validate headers.
 				if not first:
 					first = True
@@ -147,10 +146,11 @@ def get_url_headers(url):
 		raise Exception("Can't reach", url, ": ", str(e))
 
 
-def download(url, target):
+def download(url, target, session):
 	"""Download a file and save it to disk."""
 	try:
-		r = requests.get(url, stream=True)
+		# session = requests.Session()
+		r = session.get(url, stream=True, timeout=30)
 		r.raw.decode_content = True
 	except Exception as e:
 		raise Exception("Can't download", url, ": ", str(e))
@@ -183,7 +183,7 @@ def download_all(scrape_url, xlsx_dir, etags_file):
 
 	# Load the etags to compare against (and skip) file downloads.
 	etags = load_etags(etags_file)
-
+	session = requests.Session()
 	# Download and convert each sheet.
 	for n, url in enumerate(urls):
 		logger.info("%d - %s" % (n, url))
@@ -209,7 +209,7 @@ def download_all(scrape_url, xlsx_dir, etags_file):
 			etags[url] = et
 			save_etags(etags, "etags.json")
 
-			download(url, xlsx_path)
+			download(url, xlsx_path, session)
 		except Exception as e:
 			logger.exception(e)
 			continue
