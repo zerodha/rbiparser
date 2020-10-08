@@ -1,11 +1,11 @@
-# rbiparser
+### RBI Parser:
 
 A utility for downloading, parsing and sanitizing bank database (IFSC, MICR, address etc.) Excel sheets from the [RBI website](https://www.rbi.org.in/scripts/bs_viewcontent.aspx?Id=2009).
 
-### Installation.
+## Installalation:
 `pip install rbiparser`
 
-### Usage:
+## Usage:
 ```shell
 
 # Download the Excel files from the RBI website.
