@@ -311,7 +311,7 @@ def clean_row(row, filters=False):
 	row[6] = clean_line(row[6], True)
 	row[7] = clean_line(row[7], True)
 
-	if len(alphanumeric.sub("", row[7])) < 4:
+	if len(non_alphanumeric.sub("", row[7])) < 4:
 		row[7] = row[6]
 
 	row[8] = clean_line(row[8])
@@ -340,7 +340,7 @@ def clean_line(line, complicated=False):
 	# Uppercase potential abbreviations.
 	chunks = line.split(" ")
 	for n, c in enumerate(chunks):
-		if len(alphanumeric.sub("", c)) >= 3 and c not in exclude_words:
+		if len(non_alphanumeric.sub("", c)) >= 3 and c not in exclude_words:
 			chunks[n] = c.title()
 		else:
 			chunks[n] = c.upper()
