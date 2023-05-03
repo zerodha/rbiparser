@@ -48,7 +48,7 @@ banks_list_filename = "banks.json"
 filters_filename = "filters.json"
 
 # Regex
-alphanumeric = re.compile(r"[^a-z0-9]", re.IGNORECASE)
+non_alphanumeric = re.compile(r"[^a-z0-9]", re.IGNORECASE)
 spaces = re.compile(r"(\s+)")
 brackets = re.compile(r"([^\s])(\()(.+?)(\))([a-z0-9])?")
 punctuations = re.compile(r"([{}\s])\1+".format(string.punctuation))
