@@ -12,7 +12,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Run code
+      - name: Run code and save output
         run: |
-          rbiparser download -d "./xls"
+              rbiparser download -d "./xls" > output.txt
 
+
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: my-script-output
+          path: output.txt
