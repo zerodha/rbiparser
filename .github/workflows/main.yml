@@ -1,24 +1,18 @@
-name: Your Workflow Name
+name: Scheduled Workflow
 
 on:
   schedule:
-    - cron: '*/20 * * * *'
+    - cron: '0 * * * *'  # Run every hour
 
 jobs:
-  setup-go:
+  run-code:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Setup Go environment
-      uses: actions/setup-go@v4.1.0
-      with:
-        go-version: # specify your Go version if needed
-        go-version-file: # specify your go version file if needed
-        check-latest: # specify if you want to check for the latest version
-        token: ${{ github.token }}
-        cache: true
-        cache-dependency-path: # specify your cache dependency path if needed
-        architecture: # specify your target architecture if needed
+      - name: Run code
+        run: |
+          rbiparser download -d "./xls"
+
