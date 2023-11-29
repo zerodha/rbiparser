@@ -14,5 +14,4 @@ jobs:
 
       - name: Run code
         run: |
-         rbiparser download -d "./xls"
-
+          rbiparser download -d "./xls"
