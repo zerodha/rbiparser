@@ -21,10 +21,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Execute Python script
+      - name: remove rbiparser.egg-info
         run: |
-          echo "Checking current directory contents:"
-          ls -al
+          rm -rf rbiparser.egg-info
 
-          echo "Running rbiparser download -d './xls':"
-          rbiparser download -d "./xls"
+      - name: execute rbiparser
+        run: rbiparser download -d "./xls"
