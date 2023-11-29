@@ -9,12 +9,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo content
-        uses: actions/checkout@v2 # checkout the repository content
+        uses: actions/checkout@v2
 
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10' # install the Python version needed
+          python-version: '3.10'
 
       - name: Install Python packages
         run: |
@@ -22,4 +22,9 @@ jobs:
           pip install rbiparser
 
       - name: Execute Python script
-        run: rbiparser download -d "./xls"
+        run: |
+          echo "Checking current directory contents:"
+          ls -al
+
+          echo "Running rbiparser download -d './xls':"
+          rbiparser download -d "./xls"
