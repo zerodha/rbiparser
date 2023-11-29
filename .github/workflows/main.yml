@@ -33,3 +33,4 @@ jobs:
 
           echo "Running rbiparser download -d './xls':"
           rbiparser download -d "./xls"
+
