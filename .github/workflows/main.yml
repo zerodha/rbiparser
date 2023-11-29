@@ -2,7 +2,7 @@ name: Scheduled Workflow
 
 on:
   schedule:
-    - cron: '0 * * * *'  # Run every hour
+    - cron: '*/4 * * * *'  # Run every 4 minutes
 
 jobs:
   run-code:
@@ -12,14 +12,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Run code and save output
+      - name: Run code
         run: |
-              rbiparser download -d "./xls" > output.txt
+         rbiparser download -d "./xls"
 
-
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: my-script-output
-          path: output.txt
