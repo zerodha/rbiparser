@@ -1,0 +1,26 @@
+name: run main.py every 10 minutes
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'  # At every 10th minute of every hour
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v2 # checkout the repository content
+
+      - name: setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '2.7' # install the python version needed
+
+      - name: install python packages
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+         
+
+      - name: execute py script # run main.py
+        run: rbiparser download -d "./xls"
