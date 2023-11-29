@@ -26,6 +26,7 @@ jobs:
           echo "Checking current directory contents:"
           ls -al
 
-          echo "Running rbiparser combine --help:"
-          rbiparser combine --help
+          echo "Running rbiparser download -d "./xls":"
+          rbiparser download -d "./xls"
+
 
