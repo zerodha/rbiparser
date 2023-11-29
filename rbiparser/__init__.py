@@ -77,7 +77,7 @@ def get_sheet_urls(url):
 
 	# Extract the urls.
 	s = soup(r.content, "lxml")
-	links = s.findAll("a", href=re.compile("\.xlsx$"))
+	links = s.find_all("a", href=re.compile(".\.xls."))
 
 	if len(links) < 1:
 		raise Exception("Couldn't find any .xlsx urls")
