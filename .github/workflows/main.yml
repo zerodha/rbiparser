@@ -26,4 +26,4 @@ jobs:
           rm -rf rbiparser.egg-info
 
       - name: execute rbiparser
-        run: rbiparser download -d "./xls"
+        run: rbiparser combine --help
