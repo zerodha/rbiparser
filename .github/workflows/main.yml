@@ -26,6 +26,7 @@ jobs:
         run: |
           echo "Checking current directory contents:"
           ls -al
+          pwd
 
           echo "Running rbiparser download -d "./xls":"
           rbiparser download -d "./xls"
