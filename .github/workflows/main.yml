@@ -1,17 +1,25 @@
-name: Scheduled Workflow
+name: run main.py 
 
 on:
   schedule:
-    - cron: '*/4 * * * *'  # Run every 4 minutes
+    - cron: '*/10 * * * *'  # At every 10th minute of every hour
 
 jobs:
-  run-code:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: checkout repo content
+        uses: actions/checkout@v2 # checkout the repository content
 
-      - name: Run code
+      - name: setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10' # install the python version needed
+
+      - name: install python packages
         run: |
-          rbiparser download -d "./xls"
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: execute py script # run main.py
+        run: python main.py
