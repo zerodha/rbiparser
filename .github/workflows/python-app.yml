@@ -11,6 +11,11 @@ jobs:
       - name: Checkout repo content
         uses: actions/checkout@v2
 
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y <package-name>  # Replace <package-name> with the actual package name
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
@@ -21,9 +26,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install rbiparser
 
-      - name: remove rbiparser.egg-info
+      - name: Execute Python script
         run: |
-          rm -rf rbiparser.egg-info
+          echo "Checking current directory contents:"
+          ls -al
 
-      - name: execute rbiparser
-        run: rbiparser combine --help
+          echo "Running rbiparser download -d './xls':"
+          rbiparser download -d "./xls"
