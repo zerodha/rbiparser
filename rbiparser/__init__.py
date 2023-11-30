@@ -25,6 +25,7 @@ import os
 import glob
 import string
 
+
 try:
 	from urlparse import urlparse
 except ImportError:
@@ -68,7 +69,6 @@ number_suffix = re.compile(r"([0-9])(nd|rd|th)", re.IGNORECASE)
 
 exclude_words = ["to", "the", "at", "of", "by", "as", "for", "via"]
 
-
 def get_sheet_urls(url):
 	"""Scrapes the RBI page and gets the list of .xlsx sheets."""
 	r = requests.get(url)
@@ -77,7 +77,7 @@ def get_sheet_urls(url):
 
 	# Extract the urls.
 	s = soup(r.content, "lxml")
-	links = s.findAll("a", href=re.compile("\.xlsx$"))
+	links = s.find_all("a", href=re.compile(".\.xls."))
 
 	if len(links) < 1:
 		raise Exception("Couldn't find any .xlsx urls")
