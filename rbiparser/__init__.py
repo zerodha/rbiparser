@@ -69,22 +69,30 @@ number_suffix = re.compile(r"([0-9])(nd|rd|th)", re.IGNORECASE)
 exclude_words = ["to", "the", "at", "of", "by", "as", "for", "via"]
 
 
+# ... (previous code)
+
 def get_sheet_urls(url):
-	"""Scrapes the RBI page and gets the list of .xlsx sheets."""
-	r = requests.get(url)
-	if r.status_code != 200:
-		raise Exception("Invalid response from", url)
+    """Scrapes the RBI page and gets the list of .xlsx sheets."""
+    r = requests.get(url)
+    if r.status_code != 200:
+        raise Exception("Invalid response from", url)
 
-	# Extract the urls.
-	s = soup(r.content, "lxml")
-	links = s.find_all("a", attrs={"href": re.compile(r'\.xls')})
+    # Extract the HTML content for debugging.
+    html_content = r.content
+    print("HTML Content:")
+    print(html_content)
 
+    # Extract the urls.
+    s = soup(html_content, "lxml")
+    links = s.find_all("a", attrs={"href": re.compile(r'\.xls')})
 
+    if len(links) < 1:
+        raise Exception("Couldn't find any .xls urls")
 
-	if len(links) < 1:
-		raise Exception("Couldn't find any .xlsx urls")
+    return [l["href"] for l in links]
 
-	return [l["href"] for l in links]
+# ... (rest of the code)
+
 
 
 def convert_xlsx_to_csv(src, target, headers):
