@@ -68,28 +68,21 @@ number_suffix = re.compile(r"([0-9])(nd|rd|th)", re.IGNORECASE)
 
 exclude_words = ["to", "the", "at", "of", "by", "as", "for", "via"]
 
+
 def get_sheet_urls(url):
-    """Scrapes the RBI page and gets the list of .xlsx sheets."""
-    r = requests.get(url)
-    if r.status_code != 200:
-        raise Exception("Invalid response from", url)
+	"""Scrapes the RBI page and gets the list of .xlsx sheets."""
+	r = requests.get(url)
+	if r.status_code != 200:
+		raise Exception("Invalid response from", url)
 
-    # Extract the HTML content for debugging.
-    html_content = r.content
-    print("HTML Content:")
-    print(html_content)
+	# Extract the urls.
+	s = soup(r.content, "lxml")
+	links = s.find_all("a", href=re.compile(".\.xls."))
 
-    # Extract the urls.
-    s = soup(html_content, "lxml")
-    links = [a["href"] for a in s.find_all("a", href=True)]
+	if len(links) < 1:
+		raise Exception("Couldn't find any .xlsx urls")
 
-    # Filter links with ".xls" in the href.
-    xls_links = [link for link in links if ".xls" in link]
-
-    if len(xls_links) < 1:
-        raise Exception("Couldn't find any .xls urls")
-
-    return xls_links
+	return [l["href"] for l in links]
 
 
 
