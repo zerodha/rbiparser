@@ -68,22 +68,40 @@ number_suffix = re.compile(r"([0-9])(nd|rd|th)", re.IGNORECASE)
 
 exclude_words = ["to", "the", "at", "of", "by", "as", "for", "via"]
 
+import requests
+from bs4 import BeautifulSoup as soup
+import re
 
 def get_sheet_urls(url):
-	"""Scrapes the RBI page and gets the list of .xlsx sheets."""
-	r = requests.get(url)
-	if r.status_code != 200:
-		raise Exception("Invalid response from", url)
+    """Scrapes the RBI page and gets the list of .xls sheets."""
+    try:
+        r = requests.get(url)
+        r.raise_for_status()  # Raises an HTTPError for bad responses
 
-	# Extract the urls.
-	s = soup(r.content, "lxml")
-	links = s.find_all("a", href=re.compile(".\.xls."))
+        # Print the content for inspection
+        print("Page content:", r.content)
 
-	if len(links) < 1:
-		raise Exception("Couldn't find any .xlsx urls")
+        # Extract the URLs
+        s = soup(r.content, "html.parser")
+        links = s.find_all("a", href=re.compile("\.xls$"))
 
-	return [l["href"] for l in links]
+        if len(links) < 1:
+            raise Exception("Couldn't find any .xls URLs")
 
+        return [l["href"] for l in links]
+
+    except Exception as e:
+        print("Error:", e)
+        return []
+
+# Example URL
+example_url = "https://example.com/rbi_page"
+
+# Get sheet URLs
+sheet_urls = get_sheet_urls(example_url)
+
+# Print the result
+print("Sheet URLs:", sheet_urls)
 
 
 def convert_xlsx_to_csv(src, target, headers):
