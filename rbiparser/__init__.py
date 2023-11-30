@@ -24,6 +24,10 @@ import json
 import os
 import glob
 import string
+import requests
+from bs4 import BeautifulSoup as soup
+import re
+
 
 try:
 	from urlparse import urlparse
@@ -68,40 +72,41 @@ number_suffix = re.compile(r"([0-9])(nd|rd|th)", re.IGNORECASE)
 
 exclude_words = ["to", "the", "at", "of", "by", "as", "for", "via"]
 
-import requests
-from bs4 import BeautifulSoup as soup
-import re
-
 def get_sheet_urls(url):
-    """Scrapes the RBI page and gets the list of .xls sheets."""
+    """Scrapes the RBI page and gets the list of .xlsx sheets."""
     try:
-        r = requests.get(url)
-        r.raise_for_status()  # Raises an HTTPError for bad responses
+        # Adding headers to mimic a web browser
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+        }
 
-        # Print the content for inspection
-        print("Page content:", r.content)
+        # Making the request with headers and increased timeout
+        r = requests.get(url, headers=headers, timeout=10)
+        r.raise_for_status()  # Raises an HTTPError if the HTTP request returned an unsuccessful status code
 
-        # Extract the URLs
-        s = soup(r.content, "html.parser")
-        links = s.find_all("a", href=re.compile("\.xls$"))
+        # Extract the urls.
+        s = soup(r.content, "lxml")
+        links = s.find_all("a", href=re.compile(r"\.xls."))
 
         if len(links) < 1:
-            raise Exception("Couldn't find any .xls URLs")
+            raise Exception("Couldn't find any .xlsx urls")
 
         return [l["href"] for l in links]
 
-    except Exception as e:
-        print("Error:", e)
-        return []
+    except requests.exceptions.RequestException as e:
+        # Print detailed error information
+        print("Error making request:", e)
+        print("Response status code:", r.status_code)
+        print("Response content:", r.content)
+        raise
 
-# Example URL
-example_url = "https://example.com/rbi_page"
-
-# Get sheet URLs
-sheet_urls = get_sheet_urls(example_url)
-
-# Print the result
-print("Sheet URLs:", sheet_urls)
+# Example usage
+url = "https://example.com/rbi_page"
+try:
+    sheet_urls = get_sheet_urls(url)
+    print("List of .xlsx sheet URLs:", sheet_urls)
+except Exception as e:
+    print("An error occurred:", e)
 
 
 def convert_xlsx_to_csv(src, target, headers):
